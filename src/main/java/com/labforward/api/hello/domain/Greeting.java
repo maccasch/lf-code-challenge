@@ -27,7 +27,6 @@ public class Greeting implements Entity {
 
 	public Greeting(String message) {
 		this.message = message;
-		this.id = id;
 	}
 
 	public String getId() {

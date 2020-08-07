@@ -1,13 +1,15 @@
 package com.labforward.api.hello.service;
 
-import com.labforward.api.core.validation.EntityValidator;
-import com.labforward.api.hello.domain.Greeting;
-import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
+import com.labforward.api.core.exception.ResourceNotFoundException;
+import com.labforward.api.core.validation.EntityValidator;
+import com.labforward.api.hello.domain.Greeting;
 
 @Service
 public class HelloWorldService {
@@ -57,5 +59,13 @@ public class HelloWorldService {
 		this.greetings.put(greeting.getId(), greeting);
 
 		return greeting;
+	}
+
+	public Greeting updateGreeting(String id, Greeting request) {
+		entityValidator.validateUpdate(id, request);
+
+		Optional<Greeting> existingGreeting = getGreeting(request.getId());
+		existingGreeting.orElseThrow(() -> new ResourceNotFoundException(GREETING_NOT_FOUND));
+		return save(request);
 	}
 }

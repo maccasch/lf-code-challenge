@@ -1,8 +1,7 @@
 package com.labforward.api.hello;
 
-import com.labforward.api.core.exception.EntityValidationException;
-import com.labforward.api.hello.domain.Greeting;
-import com.labforward.api.hello.service.HelloWorldService;
+import java.util.Optional;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,14 +9,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Optional;
+import com.labforward.api.core.exception.EntityValidationException;
+import com.labforward.api.hello.domain.Greeting;
+import com.labforward.api.hello.service.HelloWorldService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class HelloWorldServiceTest {
 
 	@Autowired
-	private HelloWorldService helloService;
+	private HelloWorldService		helloService;
+
+	private final String		EMPTY_MESSAGE		= "";
+
+	private final String		GREETING_MESSAGE	= "Hello Luke";
+
+	private final String		UPDATE_MESSAGE		= "Hello there!";
+
+	private final Greeting		MOCK_REQUEST		= new Greeting(GREETING_MESSAGE);
 
 	public HelloWorldServiceTest() {
 	}
@@ -32,7 +41,6 @@ public class HelloWorldServiceTest {
 
 	@Test(expected = EntityValidationException.class)
 	public void createGreetingWithEmptyMessageThrowsException() {
-		final String EMPTY_MESSAGE = "";
 		helloService.createGreeting(new Greeting(EMPTY_MESSAGE));
 	}
 
@@ -43,10 +51,35 @@ public class HelloWorldServiceTest {
 
 	@Test
 	public void createGreetingOKWhenValidRequest() {
-		final String HELLO_LUKE = "Hello Luke";
-		Greeting request = new Greeting(HELLO_LUKE);
+		Greeting created = helloService.createGreeting(MOCK_REQUEST);
+		Assert.assertEquals(GREETING_MESSAGE, created.getMessage());
+	}
 
-		Greeting created = helloService.createGreeting(request);
-		Assert.assertEquals(HELLO_LUKE, created.getMessage());
+	@Test
+	public void updateGreetingOKWhenValidRequest() {
+		Greeting created = helloService.createGreeting(MOCK_REQUEST);
+
+		created.setMessage(UPDATE_MESSAGE);
+		helloService.updateGreeting(created.getId(), created);
+
+		Optional<Greeting> existing = helloService.getGreeting(created.getId());
+
+		Assert.assertEquals(created.getMessage(), existing.get().getMessage());
+	}
+
+	@Test(expected = EntityValidationException.class)
+	public void updateGreetingWithNullMessageThrowsException() {
+		Greeting created = helloService.createGreeting(MOCK_REQUEST);
+
+		created.setMessage(null);
+		helloService.updateGreeting(created.getId(), created);
+	}
+
+	@Test(expected = EntityValidationException.class)
+	public void updateGreetingWithEmptyMessageThrowsException() {
+		Greeting created = helloService.createGreeting(MOCK_REQUEST);
+
+		created.setMessage(EMPTY_MESSAGE);
+		helloService.updateGreeting(created.getId(), created);
 	}
 }
