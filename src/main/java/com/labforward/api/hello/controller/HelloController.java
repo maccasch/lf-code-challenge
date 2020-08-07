@@ -1,14 +1,17 @@
 package com.labforward.api.hello.controller;
 
-import com.labforward.api.core.exception.ResourceNotFoundException;
-import com.labforward.api.hello.domain.Greeting;
-import com.labforward.api.hello.service.HelloWorldService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.labforward.api.core.exception.ResourceNotFoundException;
+import com.labforward.api.hello.domain.Greeting;
+import com.labforward.api.hello.service.HelloWorldService;
 
 @RestController
 public class HelloController {
@@ -23,19 +26,30 @@ public class HelloController {
 
 	@RequestMapping(value = "/hello", method = RequestMethod.GET)
 	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
 	public Greeting helloWorld() {
-		return getHello(HelloWorldService.DEFAULT_ID);
+		return getGreeting(HelloWorldService.DEFAULT_ID);
 	}
 
 	@RequestMapping(value = "/hello/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public Greeting getHello(@PathVariable String id) {
+	@ResponseStatus(HttpStatus.OK)
+	public Greeting getGreeting(@PathVariable String id) {
 		return helloWorldService.getGreeting(id)
 		                        .orElseThrow(() -> new ResourceNotFoundException(GREETING_NOT_FOUND));
 	}
 
 	@RequestMapping(value = "/hello", method = RequestMethod.POST)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CREATED)
 	public Greeting createGreeting(@RequestBody Greeting request) {
 		return helloWorldService.createGreeting(request);
+	}
+
+	@RequestMapping(value = "/hello/{id}", method = RequestMethod.PUT)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
+	public Greeting updateGreeting(@PathVariable String id, @RequestBody Greeting request) {
+		return helloWorldService.updateGreeting(id, request);
 	}
 }
