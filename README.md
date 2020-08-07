@@ -31,3 +31,8 @@ Regardless of how far you take the solution towards completion, please assume yo
 Let us know if you have any questions, and we look forward to seeing your approach.
 
 Good Luck!
+
+## Code submitted
+
+- Added update greeting endpoint which a PUT method to update an existing greeting using its id.
+- Added Swagger for endpoint documentation. [click to explore](http://localhost:8080/swagger-ui.html#/)
