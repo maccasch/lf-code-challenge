@@ -13,7 +13,13 @@ import com.labforward.api.core.exception.ResourceNotFoundException;
 import com.labforward.api.hello.domain.Greeting;
 import com.labforward.api.hello.service.HelloWorldService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
+@Api(description= "Operations on greetings (Get, Get by id, Create, Update)")
 public class HelloController {
 
 	public static final String GREETING_NOT_FOUND = "Greeting Not Found";
@@ -24,6 +30,8 @@ public class HelloController {
 		this.helloWorldService = helloWorldService;
 	}
 
+	@ApiResponses(value = @ApiResponse(code = 200, message = "OK"))
+	@ApiOperation(value = "Get default greeting", response = Greeting.class)
 	@RequestMapping(value = "/hello", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
@@ -31,6 +39,8 @@ public class HelloController {
 		return getGreeting(HelloWorldService.DEFAULT_ID);
 	}
 
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"), @ApiResponse(code = 404, message = GREETING_NOT_FOUND) })
+	@ApiOperation(value = "Get greeting by id", response = Greeting.class)
 	@RequestMapping(value = "/hello/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
@@ -39,6 +49,9 @@ public class HelloController {
 		                        .orElseThrow(() -> new ResourceNotFoundException(GREETING_NOT_FOUND));
 	}
 
+	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created"),
+			@ApiResponse(code = 422, message = "Bad Request") })
+	@ApiOperation(value = "Create greeting", response = Greeting.class)
 	@RequestMapping(value = "/hello", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.CREATED)
@@ -46,6 +59,9 @@ public class HelloController {
 		return helloWorldService.createGreeting(request);
 	}
 
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 422, message = "Bad Request") })
+	@ApiOperation(value = "Update existing greeting", response = Greeting.class)
 	@RequestMapping(value = "/hello/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
